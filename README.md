@@ -1,6 +1,7 @@
 # 井字棋小游戏-Tic-Tac-Toe Classic
 
-![Tic-Tac-Toe Game](.screenshot.png)
+<img src="https://raw.githubusercontent.com/bobzhu-11/TicTacToeClassic-Unity/main/screenshot.png" alt="井字棋游戏截图" width="400" />
+
 
 ## 在线版本（itch-Unity webGL build）
 [Play Tic-Tac-Toe Classic on itch.io](https://bbzhu.itch.io/tictactoeclassic)
