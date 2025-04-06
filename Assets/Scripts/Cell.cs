@@ -10,22 +10,58 @@ public class Cell : MonoBehaviour
     private string _playerSide;
     private GameController _gameController;
 
-    public void SetCell()
+    private void Start()
     {
-        if (_gameController == null)
+        if (button != null && _gameController != null)
         {
-            Debug.LogError("GameController reference is missing in Cell.");
+            button.onClick.AddListener(() => SetCell());
+        }
+    }
+
+    public void SetCell(string side = null)
+    {
+        if (_gameController == null) return;
+
+        _playerSide = side ?? _gameController.GetPlayerSide();
+
+        if (string.IsNullOrEmpty(_playerSide))
+        {
+            if (buttonText.text == "")
+            {
+                _gameController.SelectPlayer("X", GetButtonIndex());
+            }
+
             return;
         }
-    
-        _playerSide = _gameController.GetPlayerSide();
+
+        if (!string.IsNullOrEmpty(buttonText.text)) return;
+
         buttonText.text = _playerSide;
         button.enabled = false;
         _gameController.EndTurn();
     }
 
+    private int GetButtonIndex()
+    {
+        TextMeshProUGUI[] allCells = _gameController.gridCells;
+        for (int i = 0; i < allCells.Length; i++)
+        {
+            if (allCells[i] == buttonText)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
     public void SetControllerReference(GameController gameController)
     {
         _gameController = gameController;
+        if (button != null)
+        {
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(() => SetCell());
+        }
     }
 }
