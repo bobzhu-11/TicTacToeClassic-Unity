@@ -14,6 +14,10 @@ public class GameController : MonoBehaviour
     
     public TextMeshProUGUI playerXText;
     public TextMeshProUGUI playerOText;
+    
+    // 添加玩家选择按钮引用
+    public Button playerXButton;
+    public Button playerOButton;
 
     private string _currentPlayer;
     private string _humanPlayer;
@@ -52,17 +56,20 @@ public class GameController : MonoBehaviour
         {
             // // 双人游戏模式，直接开始
             _waitingForPlayerSelection = false;
-            _humanPlayer = null;
+            // 在双人模式下，不设置_humanPlayer，这样会导致文本显示问题
             InitializeGame();
         }
         else
         {
             // // AI对战模式，等待玩家选择X或O
             _waitingForPlayerSelection = true;
+            _humanPlayer = null;
+            _aiPlayerSide = null;
             turnText.text = "开始游戏或选择玩家";
             SetAllButtonsEnabled(true);
 
             UpdatePlayerSelectionText();
+            UpdatePlayerSelectionButtons();
         }
     }
     
@@ -77,13 +84,37 @@ public class GameController : MonoBehaviour
             if (playerOText != null)
                 playerOText.text = "O（选择）";
         }
-        else
+        else if (currentGameMode == AIPlayer.Difficulty.None)
         {
+            // 双人模式下，两边都显示为玩家
             if (playerXText != null)
-                playerXText.text = _humanPlayer == playerX ? "X (玩家)" : "X (电脑)";
+                playerXText.text = "X（玩家）";
                 
             if (playerOText != null)
-                playerOText.text = _humanPlayer == playerO ? "O (玩家)" : "O (电脑)";
+                playerOText.text = "O（玩家）";
+        }
+        else
+        {
+            // AI模式下，根据玩家选择显示玩家或电脑
+            if (playerXText != null)
+                playerXText.text = _humanPlayer == playerX ? "X（玩家）" : "X（电脑）";
+                
+            if (playerOText != null)
+                playerOText.text = _humanPlayer == playerO ? "O（玩家）" : "O（电脑）";
+        }
+    }
+    
+    // 新增方法：更新玩家选择按钮状态
+    private void UpdatePlayerSelectionButtons()
+    {
+        if (playerXButton != null)
+        {
+            playerXButton.interactable = _waitingForPlayerSelection;
+        }
+        
+        if (playerOButton != null)
+        {
+            playerOButton.interactable = _waitingForPlayerSelection;
         }
     }
 
@@ -103,8 +134,6 @@ public class GameController : MonoBehaviour
         if (currentGameMode != AIPlayer.Difficulty.None)
         {
             // // AI对战模式的初始化
-            UpdatePlayerSelectionText();
-            
             if (_humanPlayer == playerO)
             {
                 // // 如果玩家选择O，AI先行
@@ -136,6 +165,10 @@ public class GameController : MonoBehaviour
             _aiPlayerInstance = null;
             SetAllButtonsEnabled(true);
         }
+        
+        // 更新UI文本和按钮状态（放在最后，确保所有设置完成后再更新UI）
+        UpdatePlayerSelectionText();
+        UpdatePlayerSelectionButtons();
     }
 
     private void SetAllButtonsEnabled(bool isButtonEnabled)
@@ -468,7 +501,9 @@ public class GameController : MonoBehaviour
             turnText.text = "开始游戏或选择玩家";
             SetAllButtonsEnabled(true);
             
+            // UI更新放在状态设置后
             UpdatePlayerSelectionText();
+            UpdatePlayerSelectionButtons();
         }
     }
 
@@ -487,6 +522,8 @@ public class GameController : MonoBehaviour
         _waitingForPlayerSelection = false;
         
         UpdatePlayerSelectionText();
+        // 更新玩家选择按钮状态
+        UpdatePlayerSelectionButtons();
         
         InitializeGame();
 
